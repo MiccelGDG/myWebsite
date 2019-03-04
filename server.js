@@ -1,5 +1,26 @@
 let http = require('http');
+let fs = require('fs');
+
 let port = 3000;
+
+//Funzioni di aiuto
+function serveStaticFile(res, path, contentType, responseCode)
+{
+    if(!responseCode) responseCode = 200;
+
+    fs.readFile(__dirname + path,(err, data) =>{
+        if(err)
+        {
+            res.writeHead(500,{'Content-Type':'text/html'})
+            res.end('Errore interno al server');
+        }
+        else
+        {
+            res.writeHead(responseCode,{'Content-Type':contentType})
+            res.end(data);
+        }
+    });
+}
 
 http.createServer((req, res) =>{
     
@@ -10,19 +31,20 @@ http.createServer((req, res) =>{
     switch(path)
     {
         case '' : 
-                 res.writeHead(200,{'Content-Type':'text/html'})
-                 res.end('<h1>Homepage</h1>');
+                 serveStaticFile(res, "/public/home.html", "text/html",200);
                  break;
         
         case '/about' : 
-                 res.writeHead(200,{'Content-Type':'text/html'})
-                 res.end('<h1>About</h1>');
-                 break;
+                serveStaticFile(res, "/public/about.html", "text/html",200);
+                break;
+        case '/chicken.png' : 
+                serveStaticFile(res, "/public/img/chicken.png", "image/jpeg",200);
+                break;
         default:
          
-                res.writeHead(400,{'Content-Type':'text/html'})
-                res.end('<h1 style="color:red">Pagina non trovata!</h1>');
-        break;
+                serveStaticFile(res, "/public/404.html", "text/html",400);
+                break;
+    
     }
 
    
